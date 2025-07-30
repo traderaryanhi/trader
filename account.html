@@ -162,24 +162,89 @@
 
   <!-- JS Functions -->
   <script>
-    function handleLogin(event) {
-      event.preventDefault();
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
-      alert("Logging in with\nEmail: " + email + "\nPassword: " + password);
-      const loginModal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
-      loginModal.hide();
-    }
+   document.getElementById("loginForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-    function handleSignUp(event) {
-      event.preventDefault();
-      const name = document.getElementById("signupName").value;
-      const email = document.getElementById("signupEmail").value;
-      const password = document.getElementById("signupPassword").value;
-      alert("Signing up:\nName: " + name + "\nEmail: " + email + "\nPassword: " + password);
-      const signupModal = bootstrap.Modal.getInstance(document.getElementById('signupModal'));
-      signupModal.hide();
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+
+  try {
+    const res = await fetch("https://api.example.com/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "YOUR_API_KEY" // if required
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      // Save token or client data
+      localStorage.setItem("token", data.token);
+
+      alert("✅ Login successful!");
+
+      // OPTIONAL: Fetch client details
+      // const clientRes = await fetch(`https://api.example.com/clients/${data.clientId}`, {
+      //   headers: { "Authorization": `Bearer ${data.token}` }
+      // });
+      // const clientDetails = await clientRes.json();
+      // console.log(clientDetails);
+
+      bootstrap.Modal.getInstance(document.getElementById("loginModal")).hide();
+    } else {
+      alert(`❌ Login failed: ${data.message || "Invalid credentials"}`);
     }
+  } catch (err) {
+    alert("⚠️ Error connecting to API!");
+  }
+});
+
+
+    document.getElementById("signupForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const name = document.getElementById("signupName").value;
+  const email = document.getElementById("signupEmail").value;
+  const password = document.getElementById("signupPassword").value;
+
+  try {
+    const res = await fetch("https://api.example.com/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "YOUR_API_KEY" // if required
+      },
+      body: JSON.stringify({ name, email, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("✅ Signup successful! Please login now.");
+      bootstrap.Modal.getInstance(document.getElementById("signupModal")).hide();
+    } else {
+      alert(`❌ Signup failed: ${data.message || "Error"}`);
+    }
+  } catch (err) {
+    alert("⚠️ Error connecting to API!");
+  }
+});
+async function loadClientDetails(clientId, token) {
+  const res = await fetch(`https://api.example.com/clients/${clientId}`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+  const client = await res.json();
+
+  document.getElementById("stockOutput").innerHTML = `
+    Welcome <b>${client.name}</b> from ${client.country}.
+  `;
+}
+
   </script>
 </body>
 </html>
