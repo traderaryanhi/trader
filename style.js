@@ -13,6 +13,13 @@ document.getElementById("loginForm").addEventListener("submit", async function (
       },
       body: JSON.stringify({ email, password })
     });
+    window.addEventListener("DOMContentLoaded", () => {
+  const clientName = localStorage.getItem("clientName");
+  if (clientName) {
+    document.getElementById("clientName").innerText = `Welcome, ${clientName}`;
+  }
+});
+
 
     const data = await res.json();
 
