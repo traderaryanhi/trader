@@ -1,3 +1,36 @@
+document.getElementById("loginForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
+
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+
+  try {
+    const res = await fetch("https://api.example.com/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": "YOUR_API_KEY"
+      },
+      body: JSON.stringify({ email, password })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      // Save token and show name
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("clientName", data.name); // store client name
+
+      document.getElementById("clientName").innerText = `Welcome, ${data.name}`;
+
+      bootstrap.Modal.getInstance(document.getElementById("loginModal")).hide();
+    } else {
+      alert(`❌ Login failed: ${data.message || "Invalid credentials"}`);
+    }
+  } catch (err) {
+    alert("⚠️ Error connecting to API!");
+  }
+});
 
   document.getElementById("loginForm").addEventListener("submit", function (e) {
     e.preventDefault();
